@@ -1,0 +1,124 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Car {
+  id      Int         @id @default(autoincrement())
+  plat    String
+  merk    String
+  status  CarStatus   @default(free)
+  trip    Trip[]
+}
+
+model Employee {
+  id          Int             @id @default(autoincrement())
+  surename    String
+  nik         String          @unique @db.VarChar(16)
+  address     String
+  phone       String
+  position    String
+  base_salary Int
+  username    String          @unique
+  nickname    String
+  password    String
+  status      EmployeeStatus  @default(off)
+  tripsAsEmployee1 Trip[]     @relation("Employee1Trips")
+  tripsAsEmployee2 Trip[]     @relation("Employee2Trips")
+  salary      Salary[]
+  wage        Wage[]
+}
+
+model Trip {
+  id          Int       @id @default(autoincrement())
+  area        String
+  estimasi    String
+  status      TripStatus
+  car_id      Int?
+  car         Car?      @relation(fields: [car_id], references: [id])
+  employee1_id Int?
+  employee1   Employee? @relation("Employee1Trips", fields: [employee1_id], references: [id])
+  employee2_id Int?
+  employee2   Employee? @relation("Employee2Trips", fields: [employee2_id], references: [id])
+  activity    Activity[]
+}
+
+model Salary {
+  id           Int          @id @default(autoincrement())
+  employee_id  Int?
+  employee     Employee?    @relation(fields: [employee_id], references: [id])
+  month        DateTime
+  salary_total Int
+  status       SalaryStatus @default(delayed)
+}
+
+model Wage {
+  id           Int        @id @default(autoincrement())
+  employee_id  Int?
+  employee     Employee?  @relation(fields: [employee_id], references: [id])
+  reason       String
+  date         DateTime
+  amount       Int
+}
+
+model Partner {
+  id           Int      @id @default(autoincrement())
+  name         String
+  address      String
+  area         String
+  phone        String
+  partner_type String
+  activity     Activity[]
+}
+
+model Activity {
+  id         Int            @id @default(autoincrement())
+  detail     String
+  date       DateTime
+  status     ActivityStatus @default(scheduled)
+  partner_id Int?
+  partner    Partner?       @relation(fields: [partner_id], references: [id])
+  trip_id    Int?
+  trip       Trip?          @relation(fields: [trip_id], references: [id])
+}
+
+enum CarStatus {
+  free
+  busy
+  broken
+}
+
+enum EmployeeStatus {
+  free
+  busy
+  off
+}
+
+enum TripStatus {
+  scheduled
+  delivered
+  canceled
+  done
+}
+
+enum SalaryStatus {
+  delayed
+  paid
+}
+
+enum ActivityStatus {
+  scheduled
+  delivered
+  canceled
+  done
+}
