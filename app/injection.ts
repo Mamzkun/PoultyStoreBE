@@ -12,31 +12,22 @@ import TripService from "./services/TripService";
 import TripController from "./controllers/TripController";
 import tripRouter from "./routes/TripRouter";
 
+// prisma
 const prisma = new PrismaClient();
+// service
+const carService = new CarService(prisma);
+const partnerService = new PartnerService(prisma);
+const employeeService = new EmployeeService(prisma);
+const tripService = new TripService(prisma);
+// controller
+const carController = new CarController(carService);
+const partnerController = new PartnerController(partnerService);
+const employeeController = new EmployeeController(employeeService);
+const tripController = new TripController(tripService);
+// router
+const carRoutes = carRouter(carController);
+const partnerRoutes = partnerRouter(partnerController);
+const employeeRoutes = employeeRouter(employeeController);
+const tripRoutes = tripRouter(tripController);
 
-const car = (prisma: PrismaClient) => {
-  const service = new CarService(prisma);
-  const controller = new CarController(service);
-  return carRouter(controller);
-};
-const partner = (prisma: PrismaClient) => {
-  const service = new PartnerService(prisma);
-  const controller = new PartnerController(service);
-  return partnerRouter(controller);
-};
-const employee = (prisma: PrismaClient) => {
-  const service = new EmployeeService(prisma);
-  const controller = new EmployeeController(service);
-  return employeeRouter(controller);
-};
-const trip = (prisma: PrismaClient) => {
-  const service = new TripService(prisma);
-  const controller = new TripController(service);
-  return tripRouter(controller);
-};
-
-const carInjection = car(prisma)
-const partnerInjection = partner(prisma)
-const employeeInjection = employee(prisma)
-const tripInjection = trip(prisma)
-export { carInjection, partnerInjection, employeeInjection, tripInjection }
+export { carRoutes, partnerRoutes, employeeRoutes, tripRoutes }
