@@ -3,9 +3,10 @@
   "module": "index.ts",
   "type": "module",
   "scripts": {
-    "dev": "bun app/index.ts",
+    "start": "bun app/index.ts",
+    "dev": "bun --hot app/index.ts",
     "migrate": "bunx prisma migrate dev --name init",
-    "lint" : "eslint"
+    "lint": "eslint"
   },
   "devDependencies": {
     "@eslint/js": "^9.6.0",

@@ -15,7 +15,7 @@ class CarController {
     this.carService = carService;
   }
 
-  getAllCars = async (res: Response) => {
+  getAllCars = async (req: Request, res: Response) => {
     try {
       const cars = await this.carService.getAllCars();
       res.json(cars);
