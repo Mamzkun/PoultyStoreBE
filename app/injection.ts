@@ -8,6 +8,9 @@ import PartnerController from "./controllers/PartnerController";
 import EmployeeService from "./services/EmployeeService";
 import EmployeeController from "./controllers/EmployeeController";
 import employeeRouter from "./routes/EmployeeRouter";
+import TripService from "./services/TripService";
+import TripController from "./controllers/TripController";
+import tripRouter from "./routes/TripRouter";
 
 const prisma = new PrismaClient();
 
@@ -26,8 +29,14 @@ const employee = (prisma: PrismaClient) => {
   const controller = new EmployeeController(service);
   return employeeRouter(controller);
 };
+const trip = (prisma: PrismaClient) => {
+  const service = new TripService(prisma);
+  const controller = new TripController(service);
+  return tripRouter(controller);
+};
 
 const carInjection = car(prisma)
 const partnerInjection = partner(prisma)
 const employeeInjection = employee(prisma)
-export { carInjection, partnerInjection, employeeInjection }
+const tripInjection = trip(prisma)
+export { carInjection, partnerInjection, employeeInjection, tripInjection }
