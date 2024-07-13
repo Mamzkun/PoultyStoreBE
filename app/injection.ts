@@ -17,6 +17,9 @@ import salaryRouter from "./routes/SalaryRouter";
 import WageService from "./services/WageService";
 import WageController from "./controllers/WageController";
 import wageRouter from "./routes/WageRouter";
+import ActivityService from "./services/ActivityService";
+import ActivityController from "./controllers/ActivityController";
+import activityRouter from "./routes/ActivityRouter";
 
 // prisma
 const prisma = new PrismaClient();
@@ -27,6 +30,7 @@ const employeeService = new EmployeeService(prisma);
 const tripService = new TripService(prisma);
 const salaryService = new SalaryService(prisma);
 const wageService = new WageService(prisma);
+const activityService = new ActivityService(prisma);
 // controller
 const carController = new CarController(carService);
 const partnerController = new PartnerController(partnerService);
@@ -34,6 +38,7 @@ const employeeController = new EmployeeController(employeeService);
 const tripController = new TripController(tripService);
 const salaryController = new SalaryController(salaryService);
 const wageController = new WageController(wageService);
+const activityController = new ActivityController(activityService);
 // router
 const carRoutes = carRouter(carController);
 const partnerRoutes = partnerRouter(partnerController);
@@ -41,5 +46,6 @@ const employeeRoutes = employeeRouter(employeeController);
 const tripRoutes = tripRouter(tripController);
 const salaryRoutes = salaryRouter(salaryController);
 const wageRoutes = wageRouter(wageController);
+const activityRoutes = activityRouter(activityController);
 
-export { carRoutes, partnerRoutes, employeeRoutes, tripRoutes, salaryRoutes, wageRoutes }
+export { carRoutes, partnerRoutes, employeeRoutes, tripRoutes, salaryRoutes, wageRoutes, activityRoutes }

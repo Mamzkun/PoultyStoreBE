@@ -1,5 +1,5 @@
 import express from 'express';
-import { carRoutes, employeeRoutes, partnerRoutes, salaryRoutes, tripRoutes, wageRoutes } from './injection';
+import { activityRoutes, carRoutes, employeeRoutes, partnerRoutes, salaryRoutes, tripRoutes, wageRoutes } from './injection';
 
 const app = express()
 
@@ -10,6 +10,7 @@ app.use('/api/employees', employeeRoutes);
 app.use('/api/trips', tripRoutes);
 app.use('/api/salaries', salaryRoutes);
 app.use('/api/wages', wageRoutes);
+app.use('/api/activity', activityRoutes);
 
 const port = 3000
 app.listen(port, () => {
