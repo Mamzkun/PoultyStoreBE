@@ -1,5 +1,6 @@
 import express from 'express';
 import { activityRoutes, carRoutes, employeeRoutes, partnerRoutes, salaryRoutes, tripRoutes, wageRoutes } from './injection';
+import seed from '../prisma/seed';
 
 const app = express()
 
@@ -11,6 +12,11 @@ app.use('/api/trips', tripRoutes);
 app.use('/api/salaries', salaryRoutes);
 app.use('/api/wages', wageRoutes);
 app.use('/api/activity', activityRoutes);
+
+app.get('/app/db/seed', async (_, res) => {
+  await seed()
+  res.json({error: false, message: 'seeding successfully'})
+})
 
 const port = 3000
 app.listen(port, () => {

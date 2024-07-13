@@ -3,10 +3,12 @@
   "module": "index.ts",
   "type": "module",
   "scripts": {
-    "start": "bun app/index.ts",
     "dev": "bun --hot app/index.ts",
-    "migrate": "bunx prisma migrate dev --name init",
-    "lint": "eslint"
+    "build": "bun build app/index.ts",
+    "start": "bun run build",
+    "db:migrate": "prisma migrate deploy",
+    "db:fresh": "prisma migrate reset --force && bun run db:migrate",
+    "db:seed": "bun run prisma/seed.ts"
   },
   "devDependencies": {
     "@eslint/js": "^9.6.0",
