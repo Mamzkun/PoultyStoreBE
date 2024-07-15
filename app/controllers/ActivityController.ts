@@ -1,12 +1,12 @@
-import type { Request, Response } from 'express';
-import ActivityService from '../services/ActivityService';
-import { 
-  PrismaClientInitializationError, 
-  PrismaClientKnownRequestError, 
-  PrismaClientRustPanicError, 
-  PrismaClientUnknownRequestError, 
-  PrismaClientValidationError 
-} from '@prisma/client/runtime/library';
+import type { Request, Response } from "express";
+import ActivityService from "../services/ActivityService";
+import {
+  PrismaClientInitializationError,
+  PrismaClientKnownRequestError,
+  PrismaClientRustPanicError,
+  PrismaClientUnknownRequestError,
+  PrismaClientValidationError,
+} from "@prisma/client/runtime/library";
 
 class ActivityController {
   private activityService: ActivityService;
@@ -17,7 +17,11 @@ class ActivityController {
 
   getAllActivitys = async (req: Request, res: Response) => {
     try {
-      const activitys = await this.activityService.getAllActivitys();
+      const { date } = req.query;
+      const formattedDate = new Date(date!.toString());
+      const activitys = await this.activityService.getAllActivitys(
+        formattedDate
+      );
       res.json(activitys);
     } catch (error) {
       const errorMessage = this.getErrorMessage(error);
@@ -32,7 +36,7 @@ class ActivityController {
       if (activity) {
         res.json(activity);
       } else {
-        res.status(404).json({ message: 'Activity not found' });
+        res.status(404).json({ message: "Activity not found" });
       }
     } catch (error) {
       const errorMessage = this.getErrorMessage(error);
@@ -73,13 +77,14 @@ class ActivityController {
   };
 
   private getErrorMessage = (error: unknown) => {
-    return error instanceof (
-      PrismaClientKnownRequestError || 
-      PrismaClientUnknownRequestError ||
-      PrismaClientRustPanicError ||
-      PrismaClientInitializationError ||
-      PrismaClientValidationError
-    ) ? error.message : 'unknown error'
+    return error instanceof
+      (PrismaClientKnownRequestError ||
+        PrismaClientUnknownRequestError ||
+        PrismaClientRustPanicError ||
+        PrismaClientInitializationError ||
+        PrismaClientValidationError)
+      ? error.message
+      : "unknown error";
   };
 }
 

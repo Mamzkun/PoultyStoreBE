@@ -1,4 +1,4 @@
-import { PrismaClient, Prisma } from '@prisma/client';
+import { PrismaClient, Prisma } from "@prisma/client";
 
 class ActivityService {
   private prisma: PrismaClient;
@@ -7,8 +7,16 @@ class ActivityService {
     this.prisma = prisma;
   }
 
-  async getAllActivitys() {
-    return this.prisma.activity.findMany();
+  async getAllActivitys(date: Date) {
+    return this.prisma.activity.findMany({
+      where: { date },
+      relationLoadStrategy: "join",
+      include: {
+        partner: {
+          select: { name: true, area: true },
+        },
+      },
+    });
   }
 
   async getActivityById(id: number) {
