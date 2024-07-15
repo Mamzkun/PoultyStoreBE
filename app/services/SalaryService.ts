@@ -1,4 +1,4 @@
-import { PrismaClient, Prisma } from '@prisma/client';
+import { PrismaClient, Prisma } from "@prisma/client";
 
 class SalaryService {
   private prisma: PrismaClient;
@@ -7,12 +7,35 @@ class SalaryService {
     this.prisma = prisma;
   }
 
-  async getAllSalarys() {
-    return this.prisma.salary.findMany();
+  async getAllSalarys(month: Date) {
+    return this.prisma.employee.findMany({
+      relationLoadStrategy: "join",
+      select: {
+        id: true,
+        surename: true,
+        username: true,
+        base_salary: true,
+        salary: {
+          where: { month },
+        },
+      },
+    });
   }
 
   async getSalaryById(id: number) {
-    return this.prisma.salary.findUnique({ where: { id } });
+    const salary = await this.prisma.salary.findUnique({ where: { id } });
+    const month = salary!.month;
+    const endOfMonth = new Date(month.getFullYear(), month.getMonth() + 1, 0);
+    const wages = await this.prisma.wage.findMany({
+      where: {
+        employee_id: salary?.employee_id,
+        date: {
+          gte: month,
+          lte: endOfMonth,
+        },
+      },
+    });
+    return { salary, wages };
   }
 
   async createSalary(data: Prisma.SalaryCreateInput) {

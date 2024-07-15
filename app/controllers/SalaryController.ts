@@ -1,12 +1,12 @@
-import type { Request, Response } from 'express';
-import SalaryService from '../services/SalaryService';
-import { 
-  PrismaClientInitializationError, 
-  PrismaClientKnownRequestError, 
-  PrismaClientRustPanicError, 
-  PrismaClientUnknownRequestError, 
-  PrismaClientValidationError 
-} from '@prisma/client/runtime/library';
+import type { Request, Response } from "express";
+import SalaryService from "../services/SalaryService";
+import {
+  PrismaClientInitializationError,
+  PrismaClientKnownRequestError,
+  PrismaClientRustPanicError,
+  PrismaClientUnknownRequestError,
+  PrismaClientValidationError,
+} from "@prisma/client/runtime/library";
 
 class SalaryController {
   private salaryService: SalaryService;
@@ -17,7 +17,9 @@ class SalaryController {
 
   getAllSalarys = async (req: Request, res: Response) => {
     try {
-      const salarys = await this.salaryService.getAllSalarys();
+      const { month } = req.query;
+      const monthDate = new Date(month!.toString());
+      const salarys = await this.salaryService.getAllSalarys(monthDate);
       res.json(salarys);
     } catch (error) {
       const errorMessage = this.getErrorMessage(error);
@@ -32,7 +34,7 @@ class SalaryController {
       if (salary) {
         res.json(salary);
       } else {
-        res.status(404).json({ message: 'Salary not found' });
+        res.status(404).json({ message: "Salary not found" });
       }
     } catch (error) {
       const errorMessage = this.getErrorMessage(error);
@@ -73,13 +75,14 @@ class SalaryController {
   };
 
   private getErrorMessage = (error: unknown) => {
-    return error instanceof (
-      PrismaClientKnownRequestError || 
-      PrismaClientUnknownRequestError ||
-      PrismaClientRustPanicError ||
-      PrismaClientInitializationError ||
-      PrismaClientValidationError
-    ) ? error.message : 'unknown error'
+    return error instanceof
+      (PrismaClientKnownRequestError ||
+        PrismaClientUnknownRequestError ||
+        PrismaClientRustPanicError ||
+        PrismaClientInitializationError ||
+        PrismaClientValidationError)
+      ? error.message
+      : "unknown error";
   };
 }
 
