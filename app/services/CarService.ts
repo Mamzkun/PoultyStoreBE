@@ -8,7 +8,16 @@ class CarService {
   }
 
   async getAllCars() {
-    return this.prisma.car.findMany();
+    return this.prisma.car.findMany({
+      relationLoadStrategy : "join",
+      include: {
+        trip : {
+          select : { id: true },
+          where : { status : 'delivered' },
+          take : 1
+        }
+      },
+    });
   }
 
   async getCarById(id: number) {
