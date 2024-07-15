@@ -8,7 +8,9 @@ class EmployeeService {
   }
 
   async getAllEmployees() {
-    return this.prisma.employee.findMany();
+    return this.prisma.employee.findMany({
+      select : { id : true, nickname : true, phone : true, status : true }
+    });
   }
 
   async getEmployeeById(id: number) {
