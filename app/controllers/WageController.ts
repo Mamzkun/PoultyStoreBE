@@ -1,12 +1,12 @@
-import type { Request, Response } from 'express';
-import WageService from '../services/WageService';
-import { 
-  PrismaClientInitializationError, 
-  PrismaClientKnownRequestError, 
-  PrismaClientRustPanicError, 
-  PrismaClientUnknownRequestError, 
-  PrismaClientValidationError 
-} from '@prisma/client/runtime/library';
+import type { Request, Response } from "express";
+import WageService from "../services/WageService";
+import {
+  PrismaClientInitializationError,
+  PrismaClientKnownRequestError,
+  PrismaClientRustPanicError,
+  PrismaClientUnknownRequestError,
+  PrismaClientValidationError,
+} from "@prisma/client/runtime/library";
 
 class WageController {
   private wageService: WageService;
@@ -32,7 +32,7 @@ class WageController {
       if (wage) {
         res.json(wage);
       } else {
-        res.status(404).json({ message: 'Wage not found' });
+        res.status(404).json({ message: "Wage not found" });
       }
     } catch (error) {
       const errorMessage = this.getErrorMessage(error);
@@ -73,13 +73,14 @@ class WageController {
   };
 
   private getErrorMessage = (error: unknown) => {
-    return error instanceof (
-      PrismaClientKnownRequestError || 
-      PrismaClientUnknownRequestError ||
-      PrismaClientRustPanicError ||
-      PrismaClientInitializationError ||
-      PrismaClientValidationError
-    ) ? error.message : 'unknown error'
+    return error instanceof
+      (PrismaClientKnownRequestError ||
+        PrismaClientUnknownRequestError ||
+        PrismaClientRustPanicError ||
+        PrismaClientInitializationError ||
+        PrismaClientValidationError)
+      ? error.message
+      : "unknown error";
   };
 }
 
