@@ -11,7 +11,7 @@ class ActivityService {
     const endOfDate = new Date(
       date.getFullYear(),
       date.getMonth(),
-      date.getDate() + 2
+      date.getDate() + 1
     );
     return this.prisma.activity.findMany({
       where: {

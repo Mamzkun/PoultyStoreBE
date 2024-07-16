@@ -1,4 +1,5 @@
 import { PrismaClient, Prisma } from "@prisma/client";
+import { toLocalTime } from "../helpers/timeHelper";
 
 class SalaryService {
   private prisma: PrismaClient;
@@ -8,7 +9,8 @@ class SalaryService {
   }
 
   async getAllSalarys(month: Date) {
-    return this.prisma.employee.findMany({
+    const utcMonth = new Date(month.getFullYear(), month.getMonth());
+    const result = await this.prisma.employee.findMany({
       relationLoadStrategy: "join",
       select: {
         id: true,
@@ -16,10 +18,19 @@ class SalaryService {
         username: true,
         base_salary: true,
         salary: {
-          where: { month },
+          where: { month: utcMonth },
         },
       },
     });
+    const resultInLocalTZ = result.map((item) => {
+      item.salary = item.salary.map((salary) => ({
+        ...salary,
+        month: toLocalTime(salary.month),
+      }));
+      return item;
+    });
+
+    return resultInLocalTZ;
   }
 
   async getSalaryById(id: number) {

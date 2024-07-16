@@ -1,4 +1,5 @@
 import { PrismaClient, Prisma } from "@prisma/client";
+import { toLocalTime } from "../helpers/timeHelper";
 
 class WageService {
   private prisma: PrismaClient;
@@ -8,11 +9,18 @@ class WageService {
   }
 
   async getAllWages() {
-    return this.prisma.wage.findMany();
+    const result = await this.prisma.wage.findMany();
+    const resultInLocalTZ = result.map((wage) => ({
+      ...wage,
+      date: toLocalTime(wage.date),
+    }));
+    return resultInLocalTZ;
   }
 
   async getWageById(id: number) {
-    return this.prisma.wage.findUnique({ where: { id } });
+    const result = await this.prisma.wage.findUnique({ where: { id } });
+    result!.date = toLocalTime(result!.date);
+    return result;
   }
 
   async createWage(data: Prisma.WageCreateInput) {
