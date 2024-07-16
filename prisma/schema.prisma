@@ -45,6 +45,7 @@ model Trip {
   area        String
   estimasi    String
   status      TripStatus
+  wage        Int
   car_id      Int?
   car         Car?      @relation(fields: [car_id], references: [id])
   employee1_id Int?

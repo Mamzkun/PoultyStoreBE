@@ -46,6 +46,7 @@ CREATE TABLE "Trip" (
     "area" TEXT NOT NULL,
     "estimasi" TEXT NOT NULL,
     "status" "TripStatus" NOT NULL,
+    "wage" INTEGER NOT NULL,
     "car_id" INTEGER,
     "employee1_id" INTEGER,
     "employee2_id" INTEGER,
