@@ -1,4 +1,4 @@
-import { PrismaClient, Prisma } from '@prisma/client';
+import { PrismaClient, Prisma, EmployeeStatus } from "@prisma/client";
 
 class EmployeeService {
   private prisma: PrismaClient;
@@ -7,9 +7,15 @@ class EmployeeService {
     this.prisma = prisma;
   }
 
-  async getAllEmployees() {
+  async getAllEmployees(status: EmployeeStatus | string) {
+    if (status === "busy" || status === "off" || status === "free") {
+      return this.prisma.employee.findMany({
+        select: { id: true, nickname: true, phone: true, status: true },
+        where: { status },
+      });
+    }
     return this.prisma.employee.findMany({
-      select : { id : true, nickname : true, phone : true, status : true }
+      select: { id: true, nickname: true, phone: true, status: true },
     });
   }
 
