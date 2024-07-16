@@ -8,8 +8,18 @@ class ActivityService {
   }
 
   async getAllActivitys(date: Date) {
+    const endOfDate = new Date(
+      date.getFullYear(),
+      date.getMonth(),
+      date.getDate() + 2
+    );
     return this.prisma.activity.findMany({
-      where: { date },
+      where: {
+        date: {
+          gte: date,
+          lte: endOfDate,
+        },
+      },
       relationLoadStrategy: "join",
       include: {
         partner: {
@@ -24,6 +34,7 @@ class ActivityService {
   }
 
   async createActivity(data: Prisma.ActivityCreateInput) {
+    data.date = new Date(data.date);
     return this.prisma.$transaction(async (tx) => {
       const newActivity = await tx.activity.create({ data });
       return newActivity;
