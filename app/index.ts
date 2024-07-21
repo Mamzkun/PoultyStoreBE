@@ -1,9 +1,11 @@
 import express from 'express';
+import cors from 'cors';
 import { activityRoutes, carRoutes, employeeRoutes, partnerRoutes, salaryRoutes, tripRoutes, wageRoutes } from './injection';
 import seed from '../prisma/seed';
 
-const app = express()
+const app = express();
 
+app.use(cors());
 app.use(express.json());
 app.use('/api/cars', carRoutes);
 app.use('/api/partners', partnerRoutes);
