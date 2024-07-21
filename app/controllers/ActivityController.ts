@@ -1,12 +1,6 @@
 import type { Request, Response } from "express";
 import ActivityService from "../services/ActivityService";
-import {
-  PrismaClientInitializationError,
-  PrismaClientKnownRequestError,
-  PrismaClientRustPanicError,
-  PrismaClientUnknownRequestError,
-  PrismaClientValidationError,
-} from "@prisma/client/runtime/library";
+import type {ApiResponse, generalError} from "../helpers/typeHelper.ts";
 
 class ActivityController {
   private activityService: ActivityService;
@@ -15,17 +9,19 @@ class ActivityController {
     this.activityService = activityService;
   }
 
-  getAllActivitys = async (req: Request, res: Response) => {
+  getAllActivities = async (req: Request, res: Response) => {
     try {
       const { date } = req.query;
       const formattedDate = new Date(date!.toString());
-      const activitys = await this.activityService.getAllActivitys(
+      const activities = await this.activityService.getAllActivities(
         formattedDate
       );
-      res.json(activitys);
+      const response: ApiResponse = {error: false, message: "getting activities successfully", data: activities};
+      res.json(response);
     } catch (error) {
-      const errorMessage = this.getErrorMessage(error);
-      res.status(500).json({ error: errorMessage });
+      const e = error as generalError;
+      const response: ApiResponse = {error: true, message: e.message};
+      res.status(500).json(response);
     }
   };
 
@@ -34,23 +30,28 @@ class ActivityController {
     try {
       const activity = await this.activityService.getActivityById(id);
       if (activity) {
-        res.json(activity);
+        const response: ApiResponse = {error: false, message: "getting activity by id successfully", data: activity};
+        res.json(response);
       } else {
-        res.status(404).json({ message: "Activity not found" });
+        const response: ApiResponse = { error: false, message: "Activity not found", data: null };
+        res.status(404).json(response);
       }
     } catch (error) {
-      const errorMessage = this.getErrorMessage(error);
-      res.status(500).json({ error: errorMessage });
+      const e = error as generalError;
+      const response: ApiResponse = {error: true, message: e.message};
+      res.status(500).json(response);
     }
   };
 
   createActivity = async (req: Request, res: Response) => {
     try {
       const activity = await this.activityService.createActivity(req.body);
-      res.status(201).json(activity);
+      const response: ApiResponse = {error: false, message: "creating new activity successfully", data: activity};
+      res.status(201).json(response);
     } catch (error) {
-      const errorMessage = this.getErrorMessage(error);
-      res.status(500).json({ error: errorMessage });
+      const e = error as generalError;
+      const response: ApiResponse = {error: true, message: e.message};
+      res.status(500).json(response);
     }
   };
 
@@ -58,10 +59,12 @@ class ActivityController {
     const id = parseInt(req.params.id, 10);
     try {
       const activity = await this.activityService.updateActivity(id, req.body);
-      res.json(activity);
+      const response: ApiResponse = {error: false, message: "updating activity successfully", data: activity};
+      res.json(response);
     } catch (error) {
-      const errorMessage = this.getErrorMessage(error);
-      res.status(500).json({ error: errorMessage });
+      const e = error as generalError;
+      const response: ApiResponse = {error: true, message: e.message};
+      res.status(500).json(response);
     }
   };
 
@@ -69,22 +72,13 @@ class ActivityController {
     const id = parseInt(req.params.id, 10);
     try {
       await this.activityService.deleteActivity(id);
-      res.status(204).send();
+      const response: ApiResponse = {error: false, message: "deleting activity successfully"};
+      res.status(204).json(response);
     } catch (error) {
-      const errorMessage = this.getErrorMessage(error);
-      res.status(500).json({ error: errorMessage });
+      const e = error as generalError;
+      const response: ApiResponse = {error: true, message: e.message};
+      res.status(500).json(response);
     }
-  };
-
-  private getErrorMessage = (error: unknown) => {
-    return error instanceof
-      (PrismaClientKnownRequestError ||
-        PrismaClientUnknownRequestError ||
-        PrismaClientRustPanicError ||
-        PrismaClientInitializationError ||
-        PrismaClientValidationError)
-      ? error.message
-      : "unknown error";
   };
 }
 

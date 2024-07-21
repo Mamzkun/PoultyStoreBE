@@ -10,11 +10,10 @@ class WageService {
 
   async getAllWages() {
     const result = await this.prisma.wage.findMany();
-    const resultInLocalTZ = result.map((wage) => ({
+    return result.map((wage) => ({
       ...wage,
       date: toLocalTime(wage.date),
     }));
-    return resultInLocalTZ;
   }
 
   async getWageById(id: number) {
@@ -98,11 +97,10 @@ class WageService {
 
   async updateWage(id: number, data: Prisma.WageUpdateInput) {
     return this.prisma.$transaction(async (tx) => {
-      const updatedWage = await tx.wage.update({
+      return tx.wage.update({
         where: { id },
         data,
       });
-      return updatedWage;
     });
   }
 

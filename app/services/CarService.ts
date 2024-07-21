@@ -29,14 +29,14 @@ class CarService {
   }
 
   async updateCar(id: number, data: Prisma.CarUpdateInput) {
-    return await this.prisma.car.update({
+    return this.prisma.car.update({
       where: { id },
       data,
     });
   }
 
   async deleteCar(id: number) {
-    return await this.prisma.car.delete({ where: { id } });
+    return this.prisma.car.delete({ where: { id } });
   }
 }
 

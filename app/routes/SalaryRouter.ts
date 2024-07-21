@@ -3,7 +3,7 @@ import type SalaryController from '../controllers/SalaryController';
 
 const salaryRouter = (salaryController: SalaryController) => {
   const router = Router();
-  router.get('/', salaryController.getAllSalarys);
+  router.get('/', salaryController.getAllSalaries);
   router.get('/:id', salaryController.getSalaryById);
   router.post('/', salaryController.createSalary);
   router.put('/:id', salaryController.updateSalary);

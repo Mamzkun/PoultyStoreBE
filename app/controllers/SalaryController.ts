@@ -1,12 +1,6 @@
 import type { Request, Response } from "express";
 import SalaryService from "../services/SalaryService";
-import {
-  PrismaClientInitializationError,
-  PrismaClientKnownRequestError,
-  PrismaClientRustPanicError,
-  PrismaClientUnknownRequestError,
-  PrismaClientValidationError,
-} from "@prisma/client/runtime/library";
+import type {ApiResponse, generalError} from "../helpers/typeHelper.ts";
 
 class SalaryController {
   private salaryService: SalaryService;
@@ -15,15 +9,22 @@ class SalaryController {
     this.salaryService = salaryService;
   }
 
-  getAllSalarys = async (req: Request, res: Response) => {
+  getAllSalaries = async (req: Request, res: Response) => {
     try {
-      const { month } = req.query;
+      const { month, user_id } = req.query;
       const monthDate = new Date(month!.toString());
-      const salarys = await this.salaryService.getAllSalarys(monthDate);
-      res.json(salarys);
+      let salaries;
+      if (user_id) {
+        salaries = await this.salaryService.getSalaryByUserMonth( parseInt(user_id.toString()), monthDate );
+      } else {
+        salaries = await this.salaryService.getAllSalaries(monthDate);
+      }
+      const response: ApiResponse = {error: false, message: "getting salaries successfully", data: salaries};
+      res.json(response);
     } catch (error) {
-      const errorMessage = this.getErrorMessage(error);
-      res.status(500).json({ error: errorMessage });
+      const e = error as generalError;
+      const response: ApiResponse = {error: true, message: e.message};
+      res.status(500).json(response);
     }
   };
 
@@ -32,23 +33,28 @@ class SalaryController {
     try {
       const salary = await this.salaryService.getSalaryById(id);
       if (salary) {
-        res.json(salary);
+        const response: ApiResponse = {error: false, message: "getting salary by id successfully", data: salary};
+        res.json(response);
       } else {
-        res.status(404).json({ message: "Salary not found" });
+        const response: ApiResponse = {error: false, message: "salary not found", data: null};
+        res.status(404).json(response);
       }
     } catch (error) {
-      const errorMessage = this.getErrorMessage(error);
-      res.status(500).json({ error: errorMessage });
+      const e = error as generalError;
+      const response: ApiResponse = {error: true, message: e.message};
+      res.status(500).json(response);
     }
   };
 
   createSalary = async (req: Request, res: Response) => {
     try {
       const salary = await this.salaryService.createSalary(req.body);
-      res.status(201).json(salary);
+      const response: ApiResponse = {error: false, message: "creating salary successfully", data: salary};
+      res.status(201).json(response);
     } catch (error) {
-      const errorMessage = this.getErrorMessage(error);
-      res.status(500).json({ error: errorMessage });
+      const e = error as generalError;
+      const response: ApiResponse = {error: true, message: e.message};
+      res.status(500).json(response);
     }
   };
 
@@ -56,10 +62,12 @@ class SalaryController {
     const id = parseInt(req.params.id, 10);
     try {
       const salary = await this.salaryService.updateSalary(id, req.body);
-      res.json(salary);
+      const response: ApiResponse = {error: false, message: "update salary successfully", data: salary};
+      res.json(response);
     } catch (error) {
-      const errorMessage = this.getErrorMessage(error);
-      res.status(500).json({ error: errorMessage });
+      const e = error as generalError;
+      const response: ApiResponse = {error: true, message: e.message};
+      res.status(500).json(response);
     }
   };
 
@@ -67,22 +75,13 @@ class SalaryController {
     const id = parseInt(req.params.id, 10);
     try {
       await this.salaryService.deleteSalary(id);
-      res.status(204).send();
+      const response: ApiResponse = {error: false, message: "deleting salary successfully"};
+      res.status(204).json(response);
     } catch (error) {
-      const errorMessage = this.getErrorMessage(error);
-      res.status(500).json({ error: errorMessage });
+      const e = error as generalError;
+      const response: ApiResponse = {error: true, message: e.message};
+      res.status(500).json(response);
     }
-  };
-
-  private getErrorMessage = (error: unknown) => {
-    return error instanceof
-      (PrismaClientKnownRequestError ||
-        PrismaClientUnknownRequestError ||
-        PrismaClientRustPanicError ||
-        PrismaClientInitializationError ||
-        PrismaClientValidationError)
-      ? error.message
-      : "unknown error";
   };
 }
 

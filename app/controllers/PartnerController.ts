@@ -1,12 +1,6 @@
 import type { Request, Response } from 'express';
 import PartnerService from '../services/PartnerService';
-import { 
-  PrismaClientInitializationError, 
-  PrismaClientKnownRequestError, 
-  PrismaClientRustPanicError, 
-  PrismaClientUnknownRequestError, 
-  PrismaClientValidationError 
-} from '@prisma/client/runtime/library';
+import type {ApiResponse, generalError} from "../helpers/typeHelper.ts";
 
 class PartnerController {
   private partnerService: PartnerService;
@@ -15,13 +9,15 @@ class PartnerController {
     this.partnerService = partnerService;
   }
 
-  getAllPartners = async (req: Request, res: Response) => {
+  getAllPartners = async (_: Request, res: Response) => {
     try {
       const partners = await this.partnerService.getAllPartners();
-      res.json(partners);
+      const response: ApiResponse = {error: false, message: "getting partners successfully", data: partners};
+      res.json(response);
     } catch (error) {
-      const errorMessage = this.getErrorMessage(error);
-      res.status(500).json({ error: errorMessage });
+      const e = error as generalError;
+      const response: ApiResponse = {error: true, message: e.message};
+      res.status(500).json(response);
     }
   };
 
@@ -30,23 +26,28 @@ class PartnerController {
     try {
       const partner = await this.partnerService.getPartnerById(id);
       if (partner) {
-        res.json(partner);
+        const response: ApiResponse = {error: false, message: "getting partner by id successfully", data: partner};
+        res.json(response);
       } else {
-        res.status(404).json({ message: 'Partner not found' });
+        const response: ApiResponse = {error: false, message: "partner not found", data: null};
+        res.status(404).json(response);
       }
     } catch (error) {
-      const errorMessage = this.getErrorMessage(error);
-      res.status(500).json({ error: errorMessage });
+      const e = error as generalError;
+      const response: ApiResponse = {error: true, message: e.message};
+      res.status(500).json(response);
     }
   };
 
   createPartner = async (req: Request, res: Response) => {
     try {
       const partner = await this.partnerService.createPartner(req.body);
-      res.status(201).json(partner);
+      const response: ApiResponse = {error: false, message: "creating new partner successfully", data: partner};
+      res.status(201).json(response);
     } catch (error) {
-      const errorMessage = this.getErrorMessage(error);
-      res.status(500).json({ error: errorMessage });
+      const e = error as generalError;
+      const response: ApiResponse = {error: true, message: e.message};
+      res.status(500).json(response);
     }
   };
 
@@ -54,10 +55,12 @@ class PartnerController {
     const id = parseInt(req.params.id, 10);
     try {
       const partner = await this.partnerService.updatePartner(id, req.body);
-      res.json(partner);
+      const response: ApiResponse = {error: false, message: "updating partner successfully", data: partner};
+      res.json(response);
     } catch (error) {
-      const errorMessage = this.getErrorMessage(error);
-      res.status(500).json({ error: errorMessage });
+      const e = error as generalError;
+      const response: ApiResponse = {error: true, message: e.message};
+      res.status(500).json(response);
     }
   };
 
@@ -65,21 +68,13 @@ class PartnerController {
     const id = parseInt(req.params.id, 10);
     try {
       await this.partnerService.deletePartner(id);
-      res.status(204).send();
+      const response: ApiResponse = {error: false, message: "deleting partner successfully"};
+      res.status(204).json(response);
     } catch (error) {
-      const errorMessage = this.getErrorMessage(error);
-      res.status(500).json({ error: errorMessage });
+      const e = error as generalError;
+      const response: ApiResponse = {error: true, message: e.message};
+      res.status(500).json(response);
     }
-  };
-
-  private getErrorMessage = (error: unknown) => {
-    return error instanceof (
-      PrismaClientKnownRequestError || 
-      PrismaClientUnknownRequestError ||
-      PrismaClientRustPanicError ||
-      PrismaClientInitializationError ||
-      PrismaClientValidationError
-    ) ? error.message : 'unknown error'
   };
 }
 

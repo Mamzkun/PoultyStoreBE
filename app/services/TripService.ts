@@ -17,18 +17,16 @@ class TripService {
 
   async createTrip(data: Prisma.TripCreateInput) {
     return this.prisma.$transaction(async (tx) => {
-      const newTrip = await tx.trip.create({ data });
-      return newTrip;
+      return tx.trip.create({ data });
     });
   }
 
   async updateTrip(id: number, data: Prisma.TripUpdateInput) {
     return this.prisma.$transaction(async (tx) => {
-      const updatedTrip = await tx.trip.update({
+      return tx.trip.update({
         where: { id },
         data,
       });
-      return updatedTrip;
     });
   }
 

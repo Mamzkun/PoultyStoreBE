@@ -1,12 +1,6 @@
 import type { Request, Response } from "express";
 import EmployeeService from "../services/EmployeeService";
-import {
-  PrismaClientInitializationError,
-  PrismaClientKnownRequestError,
-  PrismaClientRustPanicError,
-  PrismaClientUnknownRequestError,
-  PrismaClientValidationError,
-} from "@prisma/client/runtime/library";
+import type {ApiResponse, generalError} from "../helpers/typeHelper.ts";
 
 class EmployeeController {
   private employeeService: EmployeeService;
@@ -18,13 +12,13 @@ class EmployeeController {
   getAllEmployees = async (req: Request, res: Response) => {
     try {
       const { status } = req.query;
-      const employee = await this.employeeService.getAllEmployees(
-        status!.toString()
-      );
-      res.json(employee);
+      const employee = await this.employeeService.getAllEmployees(status!.toString());
+      const response: ApiResponse = {error: false, message: "getting employees successfully", data: employee};
+      res.json(response);
     } catch (error) {
-      const errorMessage = this.getErrorMessage(error);
-      res.status(500).json({ error: errorMessage });
+      const e = error as generalError;
+      const response: ApiResponse = {error: true, message: e.message};
+      res.status(500).json(response);
     }
   };
 
@@ -33,23 +27,28 @@ class EmployeeController {
     try {
       const employee = await this.employeeService.getEmployeeById(id);
       if (employee) {
-        res.json(employee);
+        const response: ApiResponse = {error: false, message: "getting employee by id successfully", data: employee};
+        res.json(response);
       } else {
-        res.status(404).json({ message: "Employee not found" });
+        const response: ApiResponse = { error: false, message: "Employee not found", data: null };
+        res.status(404).json(response);
       }
     } catch (error) {
-      const errorMessage = this.getErrorMessage(error);
-      res.status(500).json({ error: errorMessage });
+      const e = error as generalError;
+      const response: ApiResponse = {error: true, message: e.message};
+      res.status(500).json(response);
     }
   };
 
   createEmployee = async (req: Request, res: Response) => {
     try {
       const employee = await this.employeeService.createEmployee(req.body);
-      res.status(201).json(employee);
+      const response: ApiResponse = {error: false, message: "creating new employee successfully", data: employee};
+      res.status(201).json(response);
     } catch (error) {
-      const errorMessage = this.getErrorMessage(error);
-      res.status(500).json({ error: errorMessage });
+      const e = error as generalError;
+      const response: ApiResponse = {error: true, message: e.message};
+      res.status(500).json(response);
     }
   };
 
@@ -57,10 +56,12 @@ class EmployeeController {
     const id = parseInt(req.params.id, 10);
     try {
       const employee = await this.employeeService.updateEmployee(id, req.body);
-      res.json(employee);
+      const response: ApiResponse = {error: false, message: "updating employee successfully", data: employee};
+      res.json(response);
     } catch (error) {
-      const errorMessage = this.getErrorMessage(error);
-      res.status(500).json({ error: errorMessage });
+      const e = error as generalError;
+      const response: ApiResponse = {error: true, message: e.message};
+      res.status(500).json(response);
     }
   };
 
@@ -68,22 +69,13 @@ class EmployeeController {
     const id = parseInt(req.params.id, 10);
     try {
       await this.employeeService.deleteEmployee(id);
-      res.status(204).send();
+      const response: ApiResponse = {error: false, message: "deleting data successfully"};
+      res.status(204).json(response);
     } catch (error) {
-      const errorMessage = this.getErrorMessage(error);
-      res.status(500).json({ error: errorMessage });
+      const e = error as generalError;
+      const response: ApiResponse = {error: true, message: e.message};
+      res.status(500).json(response);
     }
-  };
-
-  private getErrorMessage = (error: unknown) => {
-    return error instanceof
-      (PrismaClientKnownRequestError ||
-        PrismaClientUnknownRequestError ||
-        PrismaClientRustPanicError ||
-        PrismaClientInitializationError ||
-        PrismaClientValidationError)
-      ? error.message
-      : "unknown error";
   };
 }
 

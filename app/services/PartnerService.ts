@@ -17,18 +17,16 @@ class PartnerService {
 
   async createPartner(data: Prisma.PartnerCreateInput) {
     return this.prisma.$transaction(async (tx) => {
-      const newPartner = await tx.partner.create({ data });
-      return newPartner;
+      return tx.partner.create({ data });
     });
   }
 
   async updatePartner(id: number, data: Prisma.PartnerUpdateInput) {
     return this.prisma.$transaction(async (tx) => {
-      const updatedPartner = await tx.partner.update({
+      return tx.partner.update({
         where: { id },
         data,
       });
-      return updatedPartner;
     });
   }
 

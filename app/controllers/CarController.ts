@@ -1,12 +1,6 @@
 import type { Request, Response } from 'express';
 import CarService from '../services/CarService';
-import { 
-  PrismaClientInitializationError, 
-  PrismaClientKnownRequestError, 
-  PrismaClientRustPanicError, 
-  PrismaClientUnknownRequestError, 
-  PrismaClientValidationError 
-} from '@prisma/client/runtime/library';
+import type {ApiResponse, generalError} from "../helpers/typeHelper.ts";
 
 class CarController {
   private carService: CarService;
@@ -15,13 +9,15 @@ class CarController {
     this.carService = carService;
   }
 
-  getAllCars = async (req: Request, res: Response) => {
+  getAllCars = async (_: Request, res: Response) => {
     try {
       const cars = await this.carService.getAllCars();
-      res.json(cars);
+      const response: ApiResponse = {error: false, message: "getting cars successfully", data: cars};
+      res.json(response);
     } catch (error) {
-      const errorMessage = this.getErrorMessage(error);
-      res.status(500).json({ error: errorMessage });
+      const e = error as generalError;
+      const response: ApiResponse = {error: true, message: e.message};
+      res.status(500).json(response);
     }
   };
 
@@ -30,23 +26,28 @@ class CarController {
     try {
       const car = await this.carService.getCarById(id);
       if (car) {
-        res.json(car);
+        const response: ApiResponse = {error: false, message: "getting car by id successfully", data: car};
+        res.json(response);
       } else {
-        res.status(404).json({ message: 'Car not found' });
+        const response: ApiResponse = { error: false, message: 'Car not found', data: null };
+        res.status(404).json(response);
       }
     } catch (error) {
-      const errorMessage = this.getErrorMessage(error);
-      res.status(500).json({ error: errorMessage });
+      const e = error as generalError;
+      const response: ApiResponse = {error: true, message: e.message};
+      res.status(500).json(response);
     }
   };
 
   createCar = async (req: Request, res: Response) => {
     try {
       const car = await this.carService.createCar(req.body);
-      res.status(201).json(car);
+      const response: ApiResponse = {error: false, message: "creating car successfully", data: car};
+      res.status(201).json(response);
     } catch (error) {
-      const errorMessage = this.getErrorMessage(error);
-      res.status(500).json({ error: errorMessage });
+      const e = error as generalError;
+      const response: ApiResponse = {error: true, message: e.message};
+      res.status(500).json(response);
     }
   };
 
@@ -54,10 +55,12 @@ class CarController {
     const id = parseInt(req.params.id, 10);
     try {
       const car = await this.carService.updateCar(id, req.body);
-      res.json(car);
+      const response: ApiResponse = {error: false, message: "updating car successfully", data: car};
+      res.json(response);
     } catch (error) {
-      const errorMessage = this.getErrorMessage(error);
-      res.status(500).json({ error: errorMessage });
+      const e = error as generalError;
+      const response: ApiResponse = {error: true, message: e.message};
+      res.status(500).json(response);
     }
   };
 
@@ -65,22 +68,14 @@ class CarController {
     const id = parseInt(req.params.id, 10);
     try {
       await this.carService.deleteCar(id);
-      res.status(204).send();
+      const response: ApiResponse = {error: false, message: "deleting car successfully"};
+      res.status(204).json(response);
     } catch (error) {
-      const errorMessage = this.getErrorMessage(error);
-      res.status(500).json({ error: errorMessage });
+      const e = error as generalError;
+      const response: ApiResponse = {error: true, message: e.message};
+      res.status(500).json(response);
     }
   };
-
-  private getErrorMessage = (error: unknown) => {
-    return error instanceof (
-      PrismaClientKnownRequestError || 
-      PrismaClientUnknownRequestError ||
-      PrismaClientRustPanicError ||
-      PrismaClientInitializationError ||
-      PrismaClientValidationError
-    ) ? error.message : 'unknown error'
-  }
 }
 
 export default CarController;

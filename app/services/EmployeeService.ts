@@ -25,18 +25,16 @@ class EmployeeService {
 
   async createEmployee(data: Prisma.EmployeeCreateInput) {
     return this.prisma.$transaction(async (tx) => {
-      const newEmployee = await tx.employee.create({ data });
-      return newEmployee;
+      return tx.employee.create({ data });
     });
   }
 
   async updateEmployee(id: number, data: Prisma.EmployeeUpdateInput) {
     return this.prisma.$transaction(async (tx) => {
-      const updatedEmployee = await tx.employee.update({
+      return tx.employee.update({
         where: { id },
         data,
       });
-      return updatedEmployee;
     });
   }
 

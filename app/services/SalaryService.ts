@@ -8,7 +8,7 @@ class SalaryService {
     this.prisma = prisma;
   }
 
-  async getAllSalarys(month: Date) {
+  async getAllSalaries(month: Date) {
     const utcMonth = new Date(month.getFullYear(), month.getMonth());
     const result = await this.prisma.employee.findMany({
       relationLoadStrategy: "join",
@@ -22,15 +22,13 @@ class SalaryService {
         },
       },
     });
-    const resultInLocalTZ = result.map((item) => {
+    return result.map((item) => {
       item.salary = item.salary.map((salary) => ({
         ...salary,
         month: toLocalTime(salary.month),
       }));
       return item;
     });
-
-    return resultInLocalTZ;
   }
 
   async getSalaryById(id: number) {
@@ -46,23 +44,53 @@ class SalaryService {
         },
       },
     });
-    return { salary, wages };
+    salary!.month = toLocalTime(salary!.month);
+    const wagesInLocalTZ = wages.map((wage) => ({
+      ...wage,
+      date: toLocalTime(wage.date),
+    }));
+    return { salary, wages: wagesInLocalTZ };
+  }
+
+  async getSalaryByUserMonth(employee_id: number, month: Date) {
+    const utcMonth = new Date(month.getFullYear(), month.getMonth());
+    const endOfMonth = new Date(
+      utcMonth.getFullYear(),
+      utcMonth.getMonth() + 1,
+      0
+    );
+    const salary = await this.prisma.salary.findFirst({
+      where: { employee_id, month: utcMonth },
+    });
+    const wages = await this.prisma.wage.findMany({
+      where: {
+        employee_id,
+        date: {
+          gte: utcMonth,
+          lte: endOfMonth,
+        },
+      },
+    });
+    salary!.month = toLocalTime(salary!.month);
+    const wagesInLocalTZ = wages.map((wage) => ({
+      ...wage,
+      date: toLocalTime(wage.date),
+    }));
+    return { salary, wages: wagesInLocalTZ };
   }
 
   async createSalary(data: Prisma.SalaryCreateInput) {
     return this.prisma.$transaction(async (tx) => {
-      const newSalary = await tx.salary.create({ data });
-      return newSalary;
+      return tx.salary.create({ data });
     });
   }
 
   async updateSalary(id: number, data: Prisma.SalaryUpdateInput) {
     return this.prisma.$transaction(async (tx) => {
-      const updatedSalary = await tx.salary.update({
+      return tx.salary.update({
         where: { id },
         data,
       });
-      return updatedSalary;
     });
   }
 

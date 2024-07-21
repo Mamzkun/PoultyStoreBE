@@ -7,7 +7,7 @@ class ActivityService {
     this.prisma = prisma;
   }
 
-  async getAllActivitys(date: Date) {
+  async getAllActivities(date: Date) {
     const endOfDate = new Date(
       date.getFullYear(),
       date.getMonth(),
@@ -36,18 +36,16 @@ class ActivityService {
   async createActivity(data: Prisma.ActivityCreateInput) {
     data.date = new Date(data.date);
     return this.prisma.$transaction(async (tx) => {
-      const newActivity = await tx.activity.create({ data });
-      return newActivity;
+      return tx.activity.create({data});
     });
   }
 
   async updateActivity(id: number, data: Prisma.ActivityUpdateInput) {
     return this.prisma.$transaction(async (tx) => {
-      const updatedActivity = await tx.activity.update({
+      return tx.activity.update({
         where: { id },
         data,
       });
-      return updatedActivity;
     });
   }
 
