@@ -69,7 +69,7 @@ class WageController {
     try {
       await this.wageService.deleteWage(id);
       const response: ApiResponse = {error: false, message: "deleting wage successfully", data: null};
-      res.status(204).json(response);
+      res.json(response);
     } catch (error) {
       const e = error as generalError;
       const response: ApiResponse = {error: true, message: e.message};

@@ -73,7 +73,7 @@ class ActivityController {
     try {
       await this.activityService.deleteActivity(id);
       const response: ApiResponse = {error: false, message: "deleting activity successfully"};
-      res.status(204).json(response);
+      res.json(response);
     } catch (error) {
       const e = error as generalError;
       const response: ApiResponse = {error: true, message: e.message};

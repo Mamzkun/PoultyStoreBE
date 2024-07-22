@@ -76,7 +76,7 @@ class SalaryController {
     try {
       await this.salaryService.deleteSalary(id);
       const response: ApiResponse = {error: false, message: "deleting salary successfully"};
-      res.status(204).json(response);
+      res.json(response);
     } catch (error) {
       const e = error as generalError;
       const response: ApiResponse = {error: true, message: e.message};

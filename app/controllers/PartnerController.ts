@@ -69,7 +69,7 @@ class PartnerController {
     try {
       await this.partnerService.deletePartner(id);
       const response: ApiResponse = {error: false, message: "deleting partner successfully"};
-      res.status(204).json(response);
+      res.json(response);
     } catch (error) {
       const e = error as generalError;
       const response: ApiResponse = {error: true, message: e.message};

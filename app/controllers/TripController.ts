@@ -69,7 +69,7 @@ class TripController {
     try {
       await this.tripService.deleteTrip(id);
       const response: ApiResponse = {error: false, message: "deleting trip successfully"};
-      res.status(204).json(response);
+      res.json(response);
     } catch (error) {
       const e = error as generalError;
       const response: ApiResponse = {error: true, message: e.message};
