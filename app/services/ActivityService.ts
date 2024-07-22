@@ -33,6 +33,31 @@ class ActivityService {
     return this.prisma.activity.findUnique({ where: { id } });
   }
 
+  async  getActivityWithNoTrip(date: Date) {
+    const endOfDate = new Date(
+        date.getFullYear(),
+        date.getMonth(),
+        date.getDate() + 1
+    );
+    return this.prisma.activity.findMany({
+      where: {
+        date: {
+          gte: date,
+          lte: endOfDate,
+        },
+        trip_id : {
+          not : null
+        }
+      },
+      relationLoadStrategy: "join",
+      include: {
+        partner: {
+          select: { name: true, area: true },
+        },
+      },
+    });
+  }
+
   async createActivity(data: Prisma.ActivityCreateInput) {
     data.date = new Date(data.date);
     return this.prisma.$transaction(async (tx) => {

@@ -24,6 +24,12 @@ class CarService {
     return this.prisma.car.findUnique({ where: { id } });
   }
 
+  async getCarsWithNoTrip() {
+    return this.prisma.car.findMany({
+      where: { status : 'free' }
+    });
+  }
+
   async createCar(data: Prisma.CarCreateInput) {
     return this.prisma.car.create({ data })
   }

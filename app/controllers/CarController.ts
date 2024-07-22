@@ -9,9 +9,12 @@ class CarController {
     this.carService = carService;
   }
 
-  getAllCars = async (_: Request, res: Response) => {
+  getAllCars = async (req: Request, res: Response) => {
     try {
-      const cars = await this.carService.getAllCars();
+      const { status } = req.query;
+      const cars = status && status === 'free'
+          ? await this.carService.getCarsWithNoTrip()
+          : await this.carService.getAllCars();
       const response: ApiResponse = {error: false, message: "getting cars successfully", data: cars};
       res.json(response);
     } catch (error) {
@@ -69,7 +72,7 @@ class CarController {
     try {
       await this.carService.deleteCar(id);
       const response: ApiResponse = {error: false, message: "deleting car successfully"};
-      res.status(204).json(response);
+      res.json(response);
     } catch (error) {
       const e = error as generalError;
       const response: ApiResponse = {error: true, message: e.message};
