@@ -60,6 +60,7 @@ class SalaryController {
 
   updateSalary = async (req: Request, res: Response) => {
     const id = parseInt(req.params.id, 10);
+    console.log(id, req.body);
     try {
       const salary = await this.salaryService.updateSalary(id, req.body);
       const response: ApiResponse = {error: false, message: "update salary successfully", data: salary};

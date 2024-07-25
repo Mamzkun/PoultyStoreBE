@@ -42,6 +42,7 @@ class EmployeeController {
 
   createEmployee = async (req: Request, res: Response) => {
     try {
+      req.body.base_salary = parseInt(req.body.base_salary);
       const employee = await this.employeeService.createEmployee(req.body);
       const response: ApiResponse = {error: false, message: "creating new employee successfully", data: employee};
       res.status(201).json(response);

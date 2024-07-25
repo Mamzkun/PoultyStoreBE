@@ -27,9 +27,9 @@ const prisma = new PrismaClient();
 const carService = new CarService(prisma);
 const partnerService = new PartnerService(prisma);
 const employeeService = new EmployeeService(prisma);
-const tripService = new TripService(prisma);
-const salaryService = new SalaryService(prisma);
 const wageService = new WageService(prisma);
+const tripService = new TripService(prisma, wageService);
+const salaryService = new SalaryService(prisma);
 const activityService = new ActivityService(prisma);
 // controller
 const carController = new CarController(carService);

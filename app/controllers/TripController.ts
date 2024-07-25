@@ -9,9 +9,12 @@ class TripController {
     this.tripService = tripService;
   }
 
-  getAllTrips = async (_: Request, res: Response) => {
+  getAllTrips = async (req: Request, res: Response) => {
     try {
-      const trips = await this.tripService.getAllTrips();
+      const { date } = req.query;
+      const formattedDate = new Date(date!.toString());
+
+      const trips = await this.tripService.getAllTrips(formattedDate);
       const response: ApiResponse = {error: false, message: "getting trips successfully", data: trips};
       res.json(response);
     } catch (error) {

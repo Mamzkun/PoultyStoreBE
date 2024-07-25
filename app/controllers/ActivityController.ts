@@ -45,6 +45,7 @@ class ActivityController {
 
   createActivity = async (req: Request, res: Response) => {
     try {
+      req.body.partner_id = parseInt(req.body.partner_id);
       const activity = await this.activityService.createActivity(req.body);
       const response: ApiResponse = {error: false, message: "creating new activity successfully", data: activity};
       res.status(201).json(response);

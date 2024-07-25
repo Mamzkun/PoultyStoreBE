@@ -46,6 +46,7 @@ model Trip {
   estimasi    String
   status      TripStatus
   wage        Int
+  date        DateTime
   car_id      Int?
   car         Car?      @relation(fields: [car_id], references: [id])
   employee1_id Int?

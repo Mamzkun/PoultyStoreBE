@@ -24,7 +24,7 @@ class WageService {
 
   async createWage(data: Prisma.WageCreateInput) {
     const date = new Date(data.date);
-    const userId = data.employee as number;
+    const userId = data.employee ? parseInt(data.employee.toString()) : 0;
     const startOfMonth = new Date(date.getFullYear(), date.getMonth(), 1);
     const endOfMonth = new Date(date.getFullYear(), date.getMonth() + 1, 0);
 
@@ -96,11 +96,53 @@ class WageService {
   }
 
   async updateWage(id: number, data: Prisma.WageUpdateInput) {
+    const date = new Date(data.date!.toString());
+    const userId = data.employee ? parseInt(data.employee.toString()) : 0;
+    const startOfMonth = new Date(date.getFullYear(), date.getMonth(), 1);
+    const endOfMonth = new Date(date.getFullYear(), date.getMonth() + 1, 0);
+
     return this.prisma.$transaction(async (tx) => {
-      return tx.wage.update({
-        where: { id },
-        data,
+      // Step 1: ambil id dari salary yang mau diubah
+      const salaryRecord = await tx.salary.findFirst({
+        where: {
+          employee_id: userId,
+          month: {
+            gte: startOfMonth,
+            lte: endOfMonth,
+          },
+        },
       });
+
+      // Step 2: ambil nilai wage sebelum diubah
+      const oldWage = await tx.wage.findUnique({ where: { id } });
+
+      // Step 3: update wage
+      const updatedWage = await tx.wage.update({
+        where: { id },
+        data : {
+          employee_id: userId,
+          date: date,
+          amount: data.amount,
+          reason: data.reason,
+        },
+      });
+
+      // Step 4: update salary
+      if (oldWage && salaryRecord) {
+        console.log(updatedWage.amount - oldWage.amount)
+        await tx.salary.update({
+          where: {
+            id : salaryRecord.id
+          },
+          data: {
+            salary_total: {
+              increment: updatedWage.amount - oldWage.amount,
+            },
+          },
+        });
+      }
+
+      return updatedWage;
     });
   }
 

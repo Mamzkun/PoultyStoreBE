@@ -66,6 +66,8 @@ class ActivityService {
   }
 
   async updateActivity(id: number, data: Prisma.ActivityUpdateInput) {
+    const stringDate = data.date as string;
+    data.date = new Date(stringDate);
     return this.prisma.$transaction(async (tx) => {
       return tx.activity.update({
         where: { id },

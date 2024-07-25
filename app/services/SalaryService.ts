@@ -14,8 +14,7 @@ class SalaryService {
       relationLoadStrategy: "join",
       select: {
         id: true,
-        surename: true,
-        username: true,
+        nickname: true,
         base_salary: true,
         salary: {
           where: { month: utcMonth },
@@ -62,6 +61,11 @@ class SalaryService {
     const salary = await this.prisma.salary.findFirst({
       where: { employee_id, month: utcMonth },
     });
+    
+    if (!salary) {
+      return {salary, wages: []};
+    }
+
     const wages = await this.prisma.wage.findMany({
       where: {
         employee_id,
