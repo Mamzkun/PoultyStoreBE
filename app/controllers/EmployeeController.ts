@@ -78,6 +78,19 @@ class EmployeeController {
       res.status(500).json(response);
     }
   };
+
+  login = async (req: Request, res: Response) => {
+    const { username, password } = req.body;
+    try {
+      const result = await this.employeeService.findByUsernameAndPassword(username, password);
+      const response: ApiResponse = {error: false, message: "login success", data: result};
+      res.json(response);
+    } catch (error) {
+      const e = error as generalError;
+      const response: ApiResponse = {error: true, message: e.message};
+      res.status(500).json(response);
+    }
+  }
 }
 
 export default EmployeeController;

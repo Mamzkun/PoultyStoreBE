@@ -8,6 +8,7 @@ const employeeRouter = (employeeController: EmployeeController) => {
   router.post('/', employeeController.createEmployee);
   router.put('/:id', employeeController.updateEmployee);
   router.delete('/:id', employeeController.deleteEmployee);
+  router.post('/login', employeeController.login);
   return router
 }
 
